@@ -30,20 +30,15 @@ int open_file(file_reader* reader, const char* filename) {
 void close_file(file_reader* reader) {
     reader->pos = 0;
     free(reader->file_buffer);
-    fclose(reader->file_ptr);
 }
 
 char read_file_char(file_reader* reader) {
-    char c = fgetc(reader->file_ptr);
-    return c;
+    return reader->file_buffer[reader->pos];
 }
 
 size_t file_seek_char(file_reader* reader, char c) {
     size_t pos = reader->pos;
-    while (fgetc(reader->file_ptr) != c) {
-        if (fgetc(reader->file_ptr) == EOF) {
-            return -1;
-        }
+    while (reader->file_buffer[pos] != EOF && (reader->file_buffer[pos] != c)) {
         pos++;
     }
     return pos;
@@ -59,6 +54,74 @@ typedef struct {
 typedef struct {
     char* error;
 } cimple_parser;
+
+int parser_cmd_def(cimple_parser* parser, const char* args) {
+    return 0;
+}
+
+int parser_cmd_err(cimple_parser* parser, const char* args) {
+    return 0;
+}
+
+int parser_cmd_msg(cimple_parser* parser, const char* args) {
+    return 0;
+}
+
+int parser_cmd_use(cimple_parser* parser, const char* args) {
+
+    return 0;
+}
+
+int execute_parser_command(cimple_parser* parser, const char* command) {
+    typedef struct {
+        char* command_name;
+        int (*command_function)(cimple_parser* parser, const char* args);
+    } command_entry;
+    static const command_entry* command_registry[] = {
+        {"def", parser_cmd_def },
+        {"err", parser_cmd_err },
+        {"msg", parser_cmd_msg },
+        {"use", parser_cmd_use },
+    };
+    for (size_t i = 0; i < sizeof(command_registry) / sizeof(char*); i++) { 
+        if (strncmp(command, command_registry[i], strlen(command_registry[i]) - 1) == 0) {
+            
+            
+        }
+    }
+
+    return 0;
+}
+
+int parse(cimple_parser* parser, cimple_instruction_set* instuctions, const char* filename) {
+    file_reader reader;
+    if (open_file(&reader, filename)) {
+        return 1;
+    }
+
+    // TODO: This should be dynamic
+    char cmd_buffer[256];
+    size_t i = 0;
+    reader.pos = 0;
+    char current_char;
+    while ((current_char = read_file_char(&reader)) != EOF) {
+        if (i < sizeof(cmd_buffer) - 1) {
+            cmd_buffer[i++] = (char)current_char;
+            break;
+        }
+
+        if (current_char == '@') {
+            size_t cmd_end = file_seek_char(&reader, '\n');
+            strncpy(cmd_buffer, reader.file_buffer + reader.pos + 1, cmd_end - reader.pos);
+            cmd_buffer[cmd_end - reader.pos] = '\0';
+        }
+        
+        reader.pos++;
+    }
+
+    close_file(&reader);
+    return 0;
+}
 
 typedef struct {
     char* name;
@@ -85,38 +148,6 @@ typedef struct cimple_interpreter {
     scope* curent_scope;
     char* error;
 } cimple_interpreter;
-
-
-
-cimple_instruction_set* parse(cimple_parser* parser, const char* filename) {
-    file_reader reader;
-    if (open_file(&reader, filename)) {
-        return 1;
-    }
-
-    // TODO: This should be dynamic
-    char cmd_buffer[256];
-    size_t i = 0;
-    reader.pos = 0;
-    char current_char;
-    while ((current_char = read_file_char(&reader)) != EOF) {
-        if (i < sizeof(cmd_buffer) - 1) {
-            cmd_buffer[i++] = (char)current_char;
-            break;
-        }
-
-        if (current_char == '@') {
-            size_t cmd_end = file_seek_char(&reader, '\n');
-            strncpy(cmd_buffer, reader.file_buffer + reader.pos, cmd_end - reader.pos);
-            cmd_buffer[cmd_end - reader.pos] = '\0';
-        }
-        
-        reader.pos++;
-    }
-
-    close_file(&reader);
-    return 0;
-}
 
 
 
