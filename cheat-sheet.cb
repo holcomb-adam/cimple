@@ -1,0 +1,94 @@
+#!/bin/cb
+// Easiest hello world...
+@use("std:io") as "io"
+io:print("Hello World!")
+
+// Full format variables
+var<int32> number = 1
+var<char32> letter = 'a'
+var<float8> pi = pi
+var<bool> flag = true
+
+// Simplest variable...
+int i = 1
+
+// Variables are declared by begining a statement with a type followed by a 
+// name and an optional inline assignment. "var" is a type and used to create
+// a blank value without assigning a type. Everything at its core is a "var"
+// as it refers to a fixed memory space with no assigned meaning.
+// Note: var<var> has no meaning and is simply just a var. Yes var<var<var<var<var<...>>>>> works...
+
+// Notice no semi-colons necessary... ;)
+// ...they aren't just optional however...
+@use("std:string") as "str"
+var<str> m1 = "Wow so cool!"; io:print(m1)
+
+// Since were talking about strings...
+var<str> secretMessage = "We think Cb is a great language!"
+var prefixMessage = "" // EZ type deduction! WOW!
+io:print(prefixMessage, secretMessage, var(" ...And heres a g-value string!"))
+
+// Functions...
+// Simplest function
+fn add(var a, var b) {
+    return a + b
+}
+
+// A more complicated function
+@use("std:memory") as "mem"
+fn<ptr> alloc(ptr p, var<size64> size) {
+    return mem:allocate(p, size)
+}
+
+// Pointers...
+str name = "John Doe"
+ptr pName = name.getPointer()
+//var pName = name.getPointer() // ...Also valid
+io:print("name address: ", pName, "name value: ", pName.get())
+
+
+// Classes...
+class MyBaseClass {
+    var x = 0
+    var y = 0
+}
+
+class MyClass from MyBaseClass {
+    @def MyClass:construct() {
+        static gid = 0; id = gid++
+        x = 1
+        y = 2
+    }
+
+    private var id = 0
+}
+
+MyClass myClass
+
+// "main function" 
+// This should only really be used for binary compilation
+@use("std:os") as "os"
+@def os:entry_point as fn() {
+    var msg = "This is executing from the defined entry point!"
+    io:print(msg)
+    //return 0 // Return is optional but has int type return value
+}
+
+// Templates... (oh yeah, Cb has templates too)
+// When declaring a variable, the type can be postfixed with "<>" to specify special parameters
+// These can be very different depending on the specified type
+var<int32> magicNumber = 42
+float<8> spookyFloat = 1.57
+@use("std:tmpl:char")
+char<Encoding = std:tmpl:char:utf8> specialCharacter = '!'
+
+// When declaring a class, class can be postifixed with "<>" to specify type parameters
+class<PrecisionType> Vector2D { }
+Vector2D<float32> myVec // Using the previous section to instantiate this object 
+
+// practical function use
+fn<T> add(T a, T b) {
+    return a + b
+}
+
+// This file can also be interpreted and compiled!

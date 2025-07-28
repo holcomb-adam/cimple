@@ -1,0 +1,32 @@
+@use("std:io") as "io"
+@use("std:rand") as "rand"
+@use("std:string") as "str"
+
+str userGuess
+uint8 computerGuess = rand:random(1, 10)
+bool gameRunning = true
+while gameRunning {
+    io:print("Guess? [1-10]\n")
+    io:getline(userGuess)
+    var guessAsInt = str:to_int(userGuess)
+    if guessAsInt > 10 {
+        print("Invalid guess!")
+        continue    
+    }
+    else if guessAsInt < 1 {
+        print("Invalid guess!")
+        continue
+    }
+
+    computerGuess = rand:random(1, 6)
+    if guessAsInt > computerGuess {
+        print("Too high!")
+    }
+    else if guessAsInt < computerGuess {
+        print("Too low!")
+    }
+    else {
+        print("Correct! You Win!")
+        gameRunning = false
+    }
+}
