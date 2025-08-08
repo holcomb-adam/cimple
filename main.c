@@ -46,15 +46,6 @@ size_t file_seek_char(file_reader* reader, char c) {
 
 
 
-typedef struct {
-    char* instructions;
-    size_t num_instructions;
-} cimple_instruction_set;
-
-typedef struct {
-    char* error;
-} cimple_parser;
-
 int parser_cmd_def(cimple_parser* parser, const char* args) {
     return 0;
 }
@@ -72,6 +63,18 @@ int parser_cmd_use(cimple_parser* parser, const char* args) {
     return 0;
 }
 
+char** parse_parser_command_args(cimple_parser* parser, const char* args) {
+    char* parsed_args[] = NULL;
+    for (size_t i = 0; i < sizeof(args) / sizeof(char*); i++) {
+        switch (args[i]) {
+        case '(':
+        case ')':
+            break;
+        }
+    }
+    return parsed_args;
+}
+
 int execute_parser_command(cimple_parser* parser, const char* command) {
     typedef struct {
         char* command_name;
@@ -86,7 +89,7 @@ int execute_parser_command(cimple_parser* parser, const char* command) {
     for (size_t i = 0; i < sizeof(command_registry) / sizeof(char*); i++) { 
         if (strncmp(command, command_registry[i], strlen(command_registry[i]) - 1) == 0) {
             
-            
+            command_registry[i]->command_function(parser, )
         }
     }
 
@@ -111,6 +114,7 @@ int parse(cimple_parser* parser, cimple_instruction_set* instuctions, const char
         }
 
         if (current_char == '@') {
+            parser->state_stack
             size_t cmd_end = file_seek_char(&reader, '\n');
             strncpy(cmd_buffer, reader.file_buffer + reader.pos + 1, cmd_end - reader.pos);
             cmd_buffer[cmd_end - reader.pos] = '\0';

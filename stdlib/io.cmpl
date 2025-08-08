@@ -1,0 +1,18 @@
+namespace std {
+namespace io {
+
+
+const size64 stdout
+const size64 stdin
+const size64 stderr
+
+
+template<Args...>
+fn print(Args... args) {
+    for arg in args {
+
+    }
+}
+
+}
+}
